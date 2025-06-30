@@ -21,8 +21,8 @@ app.post("/signup", async (req, res) => {
     res.status(500).send("somethig is wrong message:" + err.message);
   }
 });
-//get user by email
 
+//get user by email
 app.get("/user", async (req, res) => {
   const userEmail = req.body.emailId;
   try {
@@ -32,6 +32,7 @@ app.get("/user", async (req, res) => {
     res.status(500).send("something is wrong :" + err.message);
   }
 });
+
 //feed api GET/feed--get all the users from the feed
 app.get("/feed", async (req, res) => {
   try {
@@ -39,6 +40,29 @@ app.get("/feed", async (req, res) => {
     res.send(users);
   } catch (err) {
     res.status(500).send("Something went wrong");
+  }
+});
+
+//delete api DELETE/user-- delete the userid
+app.delete("/user", async (req, res) => {
+  const userId = req.body.userId;
+  try {
+    const user = await User.findByIdAndDelete(userId);
+    res.send("user deleted successfullyu");
+  } catch (err) {
+    res.send("something went wrong");
+  }
+});
+
+//update the user
+app.patch("/user", async (req, res) => {
+  try {
+    const userId = req.body.userId;
+    const data = req.body;
+    const user = await User.findOneAndUpdate({ _id: userId }, data);
+    res.send("updated");
+  } catch (err) {
+    res.send("something went wrong");
   }
 });
 connectDB()
