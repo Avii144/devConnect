@@ -39,7 +39,23 @@ app.post("/signup", async (req, res) => {
 });
 
 //login api
-app.post("/login", async (req, res) => {});
+app.post("/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+    const user = await User.findOne({ emailId: emailId });
+    if (!user) {
+      throw new Error("email id not found");
+    }
+    const passisValid = await bcrypt.compare(password, user.password);
+    if (passisValid) {
+      res.send("Login successfull");
+    } else {
+      throw new Error("password not valid");
+    }
+  } catch (err) {
+    res.send("something is error" + err.message);
+  }
+});
 
 //get user by email
 app.get("/user", async (req, res) => {
