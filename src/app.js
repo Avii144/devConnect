@@ -60,13 +60,23 @@ app.patch("/user", async (req, res) => {
   try {
     const userId = req.body.userId;
     const data = req.body;
+    const allowedUpdates = ["userId", "age", "gender", "about", "skills"];
+    const is_updateAllowed = Object.keys(data).every((k) =>
+      allowedUpdates.includes(k)
+    );
+
+    if (!is_updateAllowed) {
+      throw new Error("update not allowed");
+    }
+
     const user = await User.findOneAndUpdate({ _id: userId }, data, {
       returnDocument: "after",
       runValidators: true,
     });
+    console.log(user);
     res.send("updated");
   } catch (err) {
-    res.send("something went wrong");
+    res.send("update failed");
   }
 });
 
