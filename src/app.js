@@ -51,12 +51,10 @@ app.post("/login", async (req, res) => {
     if (!user) {
       throw new Error("email id not found");
     }
-    const passisValid = await bcrypt.compare(password, user.password);
+    const passisValid = await user.validatePassword(password);
     if (passisValid) {
       //create jwt token
-      const token = await jwt.sign({ _id: user._id }, "@Vinash144$", {
-        expiresIn: 60,
-      });
+      const token = await user.getJWT();
       console.log(token);
       // addthe token to the cookie send the response to the user with cookie
       res.cookie("token", token, {
