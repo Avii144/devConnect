@@ -2,26 +2,44 @@ const express = require("express");
 const connectDB = require("./config/database");
 const app = express();
 const User = require("./models/user");
+const bcrypt = require("bcrypt");
 app.use(express.json());
+const { validateSignUpData } = require("./utils/validations");
 
 //signup api
 app.post("/signup", async (req, res) => {
-  const user = new User(req.body);
-
-  ////you can use below method  for hardcoded values for dynamic one you need to use above method
-  // const user = new User({
-  //   firstname: "Avinash",
-  //   lastname: "Pilli",
-  //   emailId: "avinash@gmail.com",
-  //   password: "avinash",
-  // });
   try {
+    //validate the data
+    validateSignUpData(req);
+    const { firstName, lastName, emailId, password } = req.body;
+    //encrypt the password
+    const passwordhash = await bcrypt.hash(password, 10);
+
+    //creating new instance for the user model
+    const user = new User({
+      firstName,
+      lastName,
+      emailId,
+      password: passwordhash,
+    });
+
+    ////you can use below method  for hardcoded values for dynamic one you need to use above method
+    // const user = new User({
+    //   firstname: "Avinash",
+    //   lastname: "Pilli",
+    //   emailId: "avinash@gmail.com",
+    //   password: "avinash",
+    // });
+
     await user.save();
     res.send("user added successfully");
   } catch (err) {
     res.status(500).send("somethig is wrong message:" + err.message);
   }
 });
+
+//login api
+app.post("/login", async (req, res) => {});
 
 //get user by email
 app.get("/user", async (req, res) => {
