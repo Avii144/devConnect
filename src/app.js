@@ -6,6 +6,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const { validateSignUpData } = require("./utils/validations");
+const { userAuth } = require("./Middlewares/auth");
 
 app.use(express.json());
 app.use(cookieParser());
@@ -66,29 +67,17 @@ app.post("/login", async (req, res) => {
   }
 });
 //get profile(
-app.get("/profile", async (req, res) => {
+app.get("/profile", userAuth, async (req, res) => {
   try {
-    const cookies = req.cookies;
-    const { token } = cookies;
-    if (!token) {
-      throw new Error("invalid token");
-    }
-    const decodedMessage = await jwt.verify(token, "@Vinash144$");
-    const { _id } = decodedMessage;
-    console.log("logged in user is :" + _id);
-    const user = await User.findById(_id);
+    const user = req.user;
 
-    if (!user) {
-      res.send("No user found");
-    }
-    console.log(user);
-    res.send("reading cookies");
+    res.send(user);
   } catch (err) {
     res.send("something went wrong");
   }
 });
 //get user by email
-app.get("/user", async (req, res) => {
+app.get("/user", userAuth, async (req, res) => {
   const userEmail = req.body.emailId;
   try {
     const user = await User.find({ emailId: userEmail });
@@ -99,7 +88,7 @@ app.get("/user", async (req, res) => {
 });
 
 //feed api GET/feed--get all the users from the feed
-app.get("/feed", async (req, res) => {
+app.get("/feed", userAuth, async (req, res) => {
   try {
     const users = await User.find({});
     res.send(users);
@@ -109,7 +98,7 @@ app.get("/feed", async (req, res) => {
 });
 
 //delete api DELETE/user-- delete the userid
-app.delete("/user", async (req, res) => {
+app.delete("/user", userAuth, async (req, res) => {
   const userId = req.body.userId;
   try {
     const user = await User.findByIdAndDelete(userId);
@@ -120,7 +109,7 @@ app.delete("/user", async (req, res) => {
 });
 
 //update the user
-app.patch("/user/:userId", async (req, res) => {
+app.patch("/user/:userId", userAuth, async (req, res) => {
   const userId = req.params?.userId;
   const data = req.body;
   try {
@@ -137,7 +126,7 @@ app.patch("/user/:userId", async (req, res) => {
       returnDocument: "after",
       runValidators: true,
     });
-    console.log(user);
+
     res.send("updated");
   } catch (err) {
     res.send("update failed");
