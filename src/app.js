@@ -3,6 +3,7 @@ const connectDB = require("./config/database");
 const app = express();
 const User = require("./models/user");
 app.use(express.json());
+
 //signup api
 app.post("/signup", async (req, res) => {
   const user = new User(req.body);
@@ -59,12 +60,16 @@ app.patch("/user", async (req, res) => {
   try {
     const userId = req.body.userId;
     const data = req.body;
-    const user = await User.findOneAndUpdate({ _id: userId }, data);
+    const user = await User.findOneAndUpdate({ _id: userId }, data, {
+      returnDocument: "after",
+      runValidators: true,
+    });
     res.send("updated");
   } catch (err) {
     res.send("something went wrong");
   }
 });
+
 connectDB()
   .then(() => {
     console.log("database connected");
