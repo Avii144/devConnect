@@ -54,10 +54,14 @@ app.post("/login", async (req, res) => {
     const passisValid = await bcrypt.compare(password, user.password);
     if (passisValid) {
       //create jwt token
-      const token = await jwt.sign({ _id: user._id }, "@Vinash144$");
+      const token = await jwt.sign({ _id: user._id }, "@Vinash144$", {
+        expiresIn: 60,
+      });
       console.log(token);
       // addthe token to the cookie send the response to the user with cookie
-      res.cookie("token", token);
+      res.cookie("token", token, {
+        expires: new Date(Date.now() + 8 * 3600000),
+      });
       res.send("Login successfull");
     } else {
       throw new Error("password not valid");
@@ -76,63 +80,9 @@ app.get("/profile", userAuth, async (req, res) => {
     res.send("something went wrong");
   }
 });
-//get user by email
-app.get("/user", userAuth, async (req, res) => {
-  const userEmail = req.body.emailId;
-  try {
-    const user = await User.find({ emailId: userEmail });
-    res.send(user);
-  } catch (err) {
-    res.status(500).send("something is wrong :" + err.message);
-  }
+app.post("/sendconnectionrequest", userAuth, async (req, res) => {
+  res.send("connection request sent");
 });
-
-//feed api GET/feed--get all the users from the feed
-app.get("/feed", userAuth, async (req, res) => {
-  try {
-    const users = await User.find({});
-    res.send(users);
-  } catch (err) {
-    res.status(500).send("Something went wrong");
-  }
-});
-
-//delete api DELETE/user-- delete the userid
-app.delete("/user", userAuth, async (req, res) => {
-  const userId = req.body.userId;
-  try {
-    const user = await User.findByIdAndDelete(userId);
-    res.send("user deleted successfullyu");
-  } catch (err) {
-    res.send("something went wrong");
-  }
-});
-
-//update the user
-app.patch("/user/:userId", userAuth, async (req, res) => {
-  const userId = req.params?.userId;
-  const data = req.body;
-  try {
-    const allowedUpdates = ["age", "gender", "about", "skills"];
-    const is_updateAllowed = Object.keys(data).every((k) =>
-      allowedUpdates.includes(k)
-    );
-
-    if (!is_updateAllowed) {
-      throw new Error("update not allowed");
-    }
-
-    const user = await User.findOneAndUpdate({ _id: userId }, data, {
-      returnDocument: "after",
-      runValidators: true,
-    });
-
-    res.send("updated");
-  } catch (err) {
-    res.send("update failed");
-  }
-});
-
 connectDB()
   .then(() => {
     console.log("database connected");
