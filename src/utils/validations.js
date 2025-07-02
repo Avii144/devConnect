@@ -15,4 +15,28 @@ const validateLoginData = (req) => {
   const { emailId, password } = req.body;
 };
 
-module.exports = { validateSignUpData, validateLoginData };
+const validateProfileEdit = (req) => {
+  const allowedData = [
+    "firstName",
+    "lastName",
+    "age",
+    "gender",
+    "skills",
+    "about",
+  ];
+  const isAllowed = Object.keys(req.body).every((k) => allowedData.includes(k));
+  return isAllowed;
+};
+
+const validateChangePassword = (req) => {
+  const { password } = req.body;
+  const isValid = validator.isStrongPassword(password);
+  return isValid;
+};
+
+module.exports = {
+  validateSignUpData,
+  validateLoginData,
+  validateProfileEdit,
+  validateChangePassword,
+};
