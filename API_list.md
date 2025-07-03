@@ -1,27 +1,26 @@
 # Devtinder
 
-authRouter
+## authRouter
 
 - POST/signup
 - POST/Login
 - POST/logout
 
-profileRouter
+## profileRouter
 
 - GET/profile/view
 - PATCH/profile?edit
 - PATCH/profile/password
 
-connectionRequestRouter
+## connectionRequestRouter
 
-- POST /request/send/interested/:userId
-- POST /request/send/ignore/:userId
-- POST /request/review/accepted/:resquestId
-- POST /request/review/ignored/:resquestId
+- POST /request/send/:status/:userId
+- POST /request/review/:status/:resquestId
 
-userRouter
+Status:ignore,interested,accepted,ignored
+
+## userRouter
 
 - GET/user/connections
 - GET/user/request/received
 - GET/user/feed
-  Status:ignore,interested,accepted,ignored
