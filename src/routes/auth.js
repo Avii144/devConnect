@@ -45,6 +45,7 @@ authRouter.post("/login", async (req, res) => {
     const passisValid = await user.validatePassword(password);
     if (passisValid) {
       //create jwt token
+
       const token = await user.getJWT();
       console.log(token);
       // addthe token to the cookie send the response to the user with cookie
@@ -52,12 +53,12 @@ authRouter.post("/login", async (req, res) => {
       res.cookie("token", token, {
         expires: new Date(Date.now() + 8 * 3600000),
       });
-      res.send("Login successfull");
+      res.send(user);
     } else {
       throw new Error("password not valid");
     }
   } catch (err) {
-    res.send("something is error in Login " + err.message);
+    res.send("something is error " + err.message);
   }
 });
 
