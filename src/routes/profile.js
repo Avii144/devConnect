@@ -5,6 +5,7 @@ const {
   validateProfileEdit,
   validateChangePassword,
 } = require("../utils/validations");
+
 profileRouter.get("/profile/view", userAuth, async (req, res) => {
   try {
     const user = req.user;

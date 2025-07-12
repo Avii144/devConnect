@@ -3,6 +3,7 @@ const { userAuth } = require("../Middlewares/auth");
 const requestRouter = express.Router();
 const ConnectionRequest = require("../models/connectionRequest");
 const user = require("../models/user");
+
 requestRouter.post(
   "/request/send/:status/:toUserId",
   userAuth,
@@ -40,7 +41,7 @@ requestRouter.post(
 
       if (allowedStatus.includes(status)) {
         const data = await connectRequest.save();
-        res.send.json({
+        res.json({
           message:
             req.user.firstName + "is " + status + "your " + userTo.firstName,
           data,
