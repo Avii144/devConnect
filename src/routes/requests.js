@@ -43,7 +43,7 @@ requestRouter.post(
         const data = await connectRequest.save();
         res.json({
           message:
-            req.user.firstName + "is " + status + "your " + userTo.firstName,
+            req.user.firstName + " is " + status + " in  " + userTo.firstName,
           data,
         });
       }
@@ -55,19 +55,23 @@ requestRouter.post(
 );
 
 requestRouter.post(
-  "/request/review/:status/:resquestId",
+  "/request/review/:status/:requestId",
   userAuth,
   async (req, res) => {
     try {
       const loggedInUser = req.user;
       const status = req.params.status;
-      const requestId = req.params.resquestId;
+      const requestId = req.params.requestId;
       //or
       //const {status,requestId}=req.params;
+      const allowedStatus = ["accepted", "rejected"];
+      if (!allowedStatus.includes(status)) {
+        return res.status(400).json({ message: "status not allowed " });
+      }
       const connectionRequest = await ConnectionRequest.findById({
         _id: requestId,
         toUserId: loggedInUser._id,
-        status: "Interested",
+        status: "interested",
       });
       if (!connectionRequest) {
         return res.json({ message: "connection request not found" });
@@ -75,11 +79,7 @@ requestRouter.post(
 
       connectionRequest.status = status;
       const data = await connectionRequest.save();
-      res.json({ message: "connection request" + status });
-      const allowedStatus = ["accepted", "rejected"];
-      if (!allowedStatus.includes(status)) {
-        return res.send({ message: "status not allowed " });
-      }
+      res.json({ message: "connection request " + status, data });
     } catch (err) {
       res.send("Something is error");
     }
