@@ -24,8 +24,12 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
     Object.keys(req.body).forEach(
       (value) => (loggedInuser[value] = req.body[value])
     );
-    console.log(loggedInuser);
-    res.send("profile updated success");
+    await loggedInuser.save();
+
+    res.json({
+      message: `${loggedInuser.firstName} profile updated successfully`,
+      data: loggedInuser,
+    });
   } catch (error) {
     res.send("something is fishy" + error.message);
   }

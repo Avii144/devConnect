@@ -8,7 +8,8 @@ authRouter.post("/signup", async (req, res) => {
   try {
     //validate the data
     validateSignUpData(req);
-    const { firstName, lastName, emailId, password } = req.body;
+    const { firstName, lastName, emailId, password, age, gender, photoUrl } =
+      req.body;
     //encrypt the password
     const passwordhash = await bcrypt.hash(password, 10);
 
@@ -16,8 +17,11 @@ authRouter.post("/signup", async (req, res) => {
     const user = new User({
       firstName,
       lastName,
+      age,
       emailId,
       password: passwordhash,
+      gender,
+      photoUrl,
     });
 
     ////you can use below method  for hardcoded values for dynamic one you need to use above method
@@ -58,7 +62,7 @@ authRouter.post("/login", async (req, res) => {
       throw new Error("password not valid");
     }
   } catch (err) {
-    res.send("something is error " + err.message);
+    res.status(400).send("something is error " + err.message);
   }
 });
 
