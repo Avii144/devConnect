@@ -3,9 +3,10 @@ const userRouter = express.Router();
 const { userAuth } = require("../Middlewares/auth");
 const user = require("../models/user");
 const ConnectionRequest = require("../models/connectionRequest");
-const user_Safe_Data = "firstName , lastName";
+const user_Safe_Data = "firstName  lastName";
 
 //get all the pending connectons request from the loggedIn user
+
 userRouter.get("/user/requests/received", userAuth, async (req, res) => {
   try {
     const loggedInuser = req.user;
@@ -13,7 +14,6 @@ userRouter.get("/user/requests/received", userAuth, async (req, res) => {
       toUserId: loggedInuser._id,
       status: "interested",
     }).populate("fromUserId", ["firstName", "lastName"]);
-
     res.json({
       message: "Data fetched successfully",
       data: connectionRequests,
@@ -22,21 +22,36 @@ userRouter.get("/user/requests/received", userAuth, async (req, res) => {
     res.send("something is error");
   }
 });
+
 userRouter.get("/user/connections", userAuth, async (req, res) => {
   try {
-    const loggedInuser = req.user;
+    const loggedInUser = req.user;
+
     const connectionRequests = await ConnectionRequest.find({
       $or: [
-        { toUserId: loggedInuser._id, status: "accepted" },
-        { fromUserId: loggedInuser._id, status: "accepted" },
+        { toUserId: loggedInUser._id, status: "accepted" },
+        { fromUserId: loggedInUser._id, status: "accepted" },
       ],
-    }).populate("fromUserId", user_Safe_Data);
-    const data = connectionRequests.map((row) => row.fromUserId);
-    res.json({
-      data,
+    })
+      .populate(
+        "fromUserId",
+        "_id firstName lastName age gender about photoUrl"
+      )
+      .populate("toUserId", "_id firstName lastName age gender about photoUrl");
+
+    // return the "other" user in each connection
+    const data = connectionRequests.map((row) => {
+      const from = row.fromUserId;
+      const to = row.toUserId;
+      const loggedId = String(loggedInUser._id);
+
+      return String(from._id) === loggedId ? to : from;
     });
+
+    res.json(data);
   } catch (err) {
-    res.send("something is error");
+    console.error("Connections Error:", err);
+    res.status(500).json({ error: "Something went wrong" });
   }
 });
 

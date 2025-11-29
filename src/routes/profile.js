@@ -11,7 +11,7 @@ profileRouter.get("/profile/view", userAuth, async (req, res) => {
     const user = req.user;
     res.send(user);
   } catch (err) {
-    res.send("something went wrong");
+    res.send("something went wrong in getting view");
   }
 });
 profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
@@ -41,9 +41,7 @@ profileRouter.patch("/profile/edit/password", userAuth, async (req, res) => {
       throw new Error("need Strong password");
     }
     const user = req.user;
-    console.log(user);
     password = req.body.password;
-
     res.send("pass changed successfully");
   } catch (err) {
     res.send("Something is wrong" + err.message);
