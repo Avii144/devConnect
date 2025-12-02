@@ -41,6 +41,13 @@ const userSchema = new mongoose.Schema(
         }
       },
     },
+    isPremium: {
+      type: Boolean,
+      default: false,
+    },
+    membershiptype: {
+      type: String,
+    },
 
     city: {
       type: String,
